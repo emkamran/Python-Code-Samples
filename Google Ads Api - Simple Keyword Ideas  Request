@@ -1,0 +1,32 @@
+credentials = {
+	"use_proto_plus": True,
+  "developer_token": "your_developer_token",
+  "refresh_token": "your_refresh_token",
+  "client_id": "your_client_id",
+  "client_secret": "your_client_secret"}
+
+from google.ads.googleads.client import GoogleAdsClient
+client = GoogleAdsClient.load_from_dict(credentials)
+
+def keywords(client, customer_id, keyword_texts, page_url):
+
+	keyword_plan_idea_service = client.get_service("KeywordPlanIdeaService")
+
+  request = client.get_type("GenerateKeywordIdeasRequest")
+	request.customer_id = customer_id
+	request.include_adult_keywords = False
+
+	if not keyword_texts and page_url:
+		request.url_seed.url = page_url
+
+	if keyword_texts and not page_url:
+		request.keyword_seed.keywords.extend(keyword_texts)
+
+	if keyword_texts and page_url:
+		request.keyword_and_url_seed.url = page_url
+		request.keyword_and_url_seed.keywords.extend(keyword_texts)
+
+	keyword_ideas = keyword_plan_idea_service.generate_keyword_ideas(
+		request=request
+	)
+	return keyword_ideas
